@@ -7,8 +7,8 @@ Execute command in bash and wait to send notification via slack.
 Define this environment variables on bash before execute command.
 
 ```bash
-export NOTIFYME_SLACK=x35QCtUUQ*B376M2D8F.JntD801gqXwOMTYuZTdGhNQ0
-export NOTIFYME_CHANNEL=alerts
+export NOTIFYME_SLACK_TOKEN=x35QCtUUQ*B376M2D8F.JntD801gqXwOMTYuZTdGhNQ0
+export NOTIFYME_SLACK_CHANNEL=alerts
 ```
 
 ## Usage

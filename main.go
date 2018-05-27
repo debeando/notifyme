@@ -30,8 +30,8 @@ type Attachment struct {
 }
 
 func init() {
-  SLACK_TOKEN   = os.Getenv("NOTIFYME_SLACK")
-  SLACK_CHANNEL = os.Getenv("NOTIFYME_CHANNEL")
+  SLACK_TOKEN   = os.Getenv("NOTIFYME_SLACK_TOKEN")
+  SLACK_CHANNEL = os.Getenv("NOTIFYME_SLACK_CHANNEL")
 }
 
 func main() {
