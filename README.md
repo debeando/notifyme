@@ -2,6 +2,9 @@
 
 Execute command in bash and wait to send notification via slack.
 
+![Slack Message](https://github.com/swapbyt3s/NotifyMe/raw/master/assents/slack.png)
+
+
 ## Setup
 
 Define this environment variables on bash before execute command.
