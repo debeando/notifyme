@@ -1,9 +1,8 @@
 # NotifyMe
 
-Execute command in bash and wait to send notification via slack.
+Execute command in bash and wait to send notification via slack. It is good to save time for custum jobs.
 
 ![Slack Message](https://github.com/swapbyt3s/NotifyMe/raw/master/assents/slack.png)
-
 
 ## Setup
 
@@ -19,7 +18,8 @@ export NOTIFYME_SLACK_CHANNEL=alerts
 Is very easy to use:
 
 ```bash
-./notifyme "ls -lah"
+./notifyme "mysqldump --login-path=local foo | gzip > backup.tar.gz"
 ```
 
-And work on something else until you wait for notification in slack. Maybe to not lost execution, run this command into `tmux` or `screen`.
+And work on something else until you wait for notification in slack. Maybe to not lost execution, run this command
+into `tmux` or `screen`.
