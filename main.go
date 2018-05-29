@@ -4,6 +4,7 @@ import (
   "bytes"
   "encoding/json"
   "fmt"
+  "net"
   "net/http"
   "os"
   "os/exec"
@@ -54,7 +55,7 @@ func main() {
   }
 
   msg := &Message{
-    Text: "Finished executing command on server",
+    Text: fmt.Sprintf("%s(%s)\nFinish executing the command on the server", hostname(), ip_address()),
     Channel: SLACK_CHANNEL,
   }
   msg.AddAttachment(&Attachment{
@@ -104,4 +105,27 @@ func slack_hook(msg *Message) {
 
   fmt.Printf("--> Slack POST status code: %d\n", resp.StatusCode)
   defer resp.Body.Close()
+}
+
+func hostname() string {
+  host, err := os.Hostname()
+  if err != nil {
+    fmt.Print(err)
+  }
+
+  return host
+}
+
+func ip_address() string {
+  addrs, err := net.LookupIP(hostname())
+  if err != nil {
+    fmt.Print(err)
+  }
+
+  for _, addr := range addrs {
+    if ipv4 := addr.To4(); ipv4 != nil {
+      return ipv4.String()
+    }
+  }
+  return ""
 }
