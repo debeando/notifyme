@@ -36,19 +36,20 @@ func init() {
 }
 
 func main() {
-  loc, _  := time.LoadLocation("UTC")
-  start   := time.Now().In(loc)
   command := strings.Join(os.Args[1:], " ")
   color   := "good"
 
   fmt.Printf("==> Run...\n")
   fmt.Printf("--> Command: %s\n", command)
+  start := current_timestamp()
   fmt.Printf("--> Start at: %s\n", start)
   stdout, exitcode := exec_command(command)
   fmt.Printf("--> Stdout: \n%s\n", stdout)
   fmt.Printf("--> Exit code: %d\n", exitcode)
-  end := time.Now().In(loc)
+  end  := current_timestamp()
+  diff := diffrence_timestamp(start, end)
   fmt.Printf("--> End at: %s\n", end)
+  fmt.Printf("--> Diffrence in seconds: %d\n", diff)
 
   if exitcode != 0 {
     color = "danger"
@@ -60,7 +61,7 @@ func main() {
   }
   msg.AddAttachment(&Attachment{
     Color: color,
-    Text: fmt.Sprintf("*Command:* %s\n*Start at:* %s\n*End at:* %s\n*Exit code:* %d", command, start, end, exitcode),
+    Text: fmt.Sprintf("*Command:* %s\n*Start at:* %s\n*End at:* %s\n*Diffrence in seconds:* %d\n*Exit code:* %d", command, start, end, diff, exitcode),
   })
 
   slack_hook(msg)
@@ -128,4 +129,16 @@ func ip_address() string {
     }
   }
   return ""
+}
+
+func current_timestamp() string {
+  t := time.Now().UTC()
+  return fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second())
+}
+
+func diffrence_timestamp(start string, end string) int {
+  parsed_start , _ := time.Parse("2006-01-02 15:04:05", start);
+  parsed_end   , _ := time.Parse("2006-01-02 15:04:05", end);
+
+  return int(parsed_end.Sub(parsed_start).Seconds())
 }
