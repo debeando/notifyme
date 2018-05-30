@@ -37,34 +37,38 @@ func init() {
 
 func main() {
   command := strings.Join(os.Args[1:], " ")
-  color   := "good"
 
-  fmt.Printf("==> Run...\n")
-  fmt.Printf("--> Command: %s\n", command)
-  start := current_timestamp()
-  fmt.Printf("--> Start at: %s\n", start)
-  stdout, exitcode := exec_command(command)
-  fmt.Printf("--> Stdout: \n%s\n", stdout)
-  fmt.Printf("--> Exit code: %d\n", exitcode)
-  end  := current_timestamp()
-  diff := diffrence_timestamp(start, end)
-  fmt.Printf("--> End at: %s\n", end)
-  fmt.Printf("--> Diffrence in seconds: %d\n", diff)
+  if len(command) > 0 {
+    color := "good"
 
-  if exitcode != 0 {
-    color = "danger"
+    fmt.Printf("==> Run...\n")
+    fmt.Printf("--> Command: %s\n", command)
+    start := current_timestamp()
+    fmt.Printf("--> Start at: %s\n", start)
+    stdout, exitcode := exec_command(command)
+    stdout = clear_stdout(stdout)
+    fmt.Printf("--> Stdout: %s", stdout)
+    fmt.Printf("--> Exit code: %d\n", exitcode)
+    end  := current_timestamp()
+    diff := duration(start, end)
+    fmt.Printf("--> End at: %s\n", end)
+    fmt.Printf("--> Duration: %d\n", diff)
+
+    if exitcode != 0 {
+      color = "danger"
+    }
+
+    msg := &Message{
+      Text: fmt.Sprintf("%s(%s)\nFinish executing the command on the server", hostname(), ip_address()),
+      Channel: SLACK_CHANNEL,
+    }
+    msg.AddAttachment(&Attachment{
+      Color: color,
+      Text: fmt.Sprintf("*Command:* `%s`\n*Start at:* %s\n*End at:* %s\n*Duration:* %d seconds\n*Exit code:* %d", command, start, end, diff, exitcode),
+    })
+
+    slack_hook(msg)
   }
-
-  msg := &Message{
-    Text: fmt.Sprintf("%s(%s)\nFinish executing the command on the server", hostname(), ip_address()),
-    Channel: SLACK_CHANNEL,
-  }
-  msg.AddAttachment(&Attachment{
-    Color: color,
-    Text: fmt.Sprintf("*Command:* %s\n*Start at:* %s\n*End at:* %s\n*Diffrence in seconds:* %d\n*Exit code:* %d", command, start, end, diff, exitcode),
-  })
-
-  slack_hook(msg)
 }
 
 func exec_command(cmd string) (stdout string, exitcode int) {
@@ -136,9 +140,19 @@ func current_timestamp() string {
   return fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second())
 }
 
-func diffrence_timestamp(start string, end string) int {
+func duration(start string, end string) int {
   parsed_start , _ := time.Parse("2006-01-02 15:04:05", start);
   parsed_end   , _ := time.Parse("2006-01-02 15:04:05", end);
 
   return int(parsed_end.Sub(parsed_start).Seconds())
+}
+
+func clear_stdout(stdout string) string {
+  if strings.HasPrefix(stdout, "\n") == false {
+    stdout = "\n" + stdout
+  }
+  if strings.HasSuffix(stdout, "\n") == false {
+    stdout = stdout + "\n"
+  }
+  return stdout
 }
