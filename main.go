@@ -59,7 +59,7 @@ func main() {
     }
 
     msg := &Message{
-      Text: fmt.Sprintf("%s(%s)\nFinish executing the command on the server", hostname(), ip_address()),
+      Text: fmt.Sprintf("*From*: %s (%s)\nFinish executing the command on the server", hostname(), ip_address()),
       Channel: SLACK_CHANNEL,
     }
     msg.AddAttachment(&Attachment{
@@ -68,6 +68,8 @@ func main() {
     })
 
     slack_hook(msg)
+  } else {
+    fmt.Printf("Usage: %s <command>\n", os.Args[0])
   }
 }
 
