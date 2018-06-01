@@ -31,8 +31,8 @@ type Attachment struct {
 }
 
 func init() {
-  SLACK_TOKEN   = os.Getenv("NOTIFYME_SLACK_TOKEN")
-  SLACK_CHANNEL = os.Getenv("NOTIFYME_SLACK_CHANNEL")
+  SLACK_CHANNEL = lookup_env("NOTIFYME_SLACK_CHANNEL", "alerts")
+  SLACK_TOKEN   = lookup_env("NOTIFYME_SLACK_TOKEN", "")
 }
 
 func main() {
@@ -157,4 +157,17 @@ func clear_stdout(stdout string) string {
     stdout = stdout + "\n"
   }
   return stdout
+}
+
+func lookup_env(key string, default_value string) string {
+  val, ok := os.LookupEnv(key)
+  if !ok {
+    if len(default_value) == 0 {
+      fmt.Printf("Environment variable not defined: %s\n", key)
+      os.Exit(1)
+    }
+    return default_value
+  }
+
+  return val
 }
