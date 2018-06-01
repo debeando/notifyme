@@ -18,7 +18,7 @@ export NOTIFYME_SLACK_CHANNEL=alerts
 Is very easy to use:
 
 ```bash
-./notifyme "mysqldump --login-path=local foo | gzip > backup.tar.gz"
+./nm "mysqldump --login-path=local foo | gzip > backup.tar.gz"
 ```
 
 And work on something else until you wait for notification in slack. Maybe to not lost execution, run this command

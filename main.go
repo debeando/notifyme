@@ -13,8 +13,15 @@ import (
   "time"
 )
 
-var SLACK_TOKEN   string = ""
-var SLACK_CHANNEL string = ""
+const (
+  VERSION = "v0.1.2"
+  USAGE   = "notifyme (%s)\nUsage: %s <command>\n"
+)
+
+var (
+  SLACK_CHANNEL string = ""
+  SLACK_TOKEN   string = ""
+)
 
 type Message struct {
   Text        string        `json:"text"`
@@ -41,7 +48,7 @@ func main() {
   if len(command) > 0 {
     color := "good"
 
-    fmt.Printf("==> Run...\n")
+    fmt.Printf("==> Run notifyme...\n")
     fmt.Printf("--> Command: %s\n", command)
     start := current_timestamp()
     fmt.Printf("--> Start at: %s\n", start)
@@ -69,7 +76,7 @@ func main() {
 
     slack_hook(msg)
   } else {
-    fmt.Printf("Usage: %s <command>\n", os.Args[0])
+    fmt.Printf(USAGE, VERSION, os.Args[0])
   }
 }
 

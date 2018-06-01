@@ -25,8 +25,8 @@ declare -a OS=("linux" "darwin")
 for os in "${OS[@]}"
 do
   mkdir -p pkg/${os}_amd64/
-  GOOS=${os} GOARCH=amd64 go build -ldflags "-s -w" -o pkg/${os}_amd64/notifyme main.go
-  tar -czvf pkg/${os}_amd64/notifyme-${TAG}-${os}_amd64.tar.gz pkg/${os}_amd64/notifyme
+  GOOS=${os} GOARCH=amd64 go build -ldflags "-s -w" -o pkg/${os}_amd64/nm main.go
+  tar -czvf pkg/${os}_amd64/notifyme-${TAG}-${os}_amd64.tar.gz pkg/${os}_amd64/nm
 
   curl -# \
        -XPOST \
