@@ -1,6 +1,7 @@
 # NotifyMe
 
-Execute command in bash and wait to send notification via slack. It is good to save time for custum jobs.
+Execute command in bash and wait to send notification via slack. It is good to save time for custom jobs when take much
+time to complete and have news when is finished and profit the time.
 
 ![Slack Message](https://github.com/swapbyt3s/NotifyMe/raw/master/assents/slack.png)
 
