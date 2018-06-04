@@ -7,6 +7,7 @@ import (
   "net"
   "net/http"
   "os"
+  "os/signal"
   "os/exec"
   "strings"
   "syscall"
@@ -15,7 +16,9 @@ import (
 
 const (
   VERSION = "v0.1.2"
-  USAGE   = "notifyme (%s)\nUsage: %s <command>\n"
+  USAGE = "notifyme (%s)\nUsage: %s <command>\n"
+  MESSAGE_TEXT = "*From*: %s (%s)\nFinish executing the command on the server"
+  MESSAGE_ATTACHMENT_TEXT = "*Command:* `%s`\n*Start at:* %s\n*End at:* %s\n*Duration:* %d seconds\n*Exit code:* %d"
 )
 
 var (
@@ -43,15 +46,18 @@ func init() {
 }
 
 func main() {
-  command := strings.Join(os.Args[1:], " ")
+  wait_for_interrupt()
+
+  command := get_command()
 
   if len(command) > 0 {
     color := "good"
 
     fmt.Printf("==> Run notifyme...\n")
-    fmt.Printf("--> Command: %s\n", command)
+    fmt.Printf("--> Press Ctrl+C to end.\n")
     start := current_timestamp()
     fmt.Printf("--> Start at: %s\n", start)
+    fmt.Printf("--> Wait to finish command: %s\n", command)
     stdout, exitcode := exec_command(command)
     stdout = clear_stdout(stdout)
     fmt.Printf("--> Stdout: %s", stdout)
@@ -66,18 +72,38 @@ func main() {
     }
 
     msg := &Message{
-      Text: fmt.Sprintf("*From*: %s (%s)\nFinish executing the command on the server", hostname(), ip_address()),
+      Text: fmt.Sprintf(MESSAGE_TEXT, hostname(), ip_address()),
       Channel: SLACK_CHANNEL,
     }
     msg.AddAttachment(&Attachment{
       Color: color,
-      Text: fmt.Sprintf("*Command:* `%s`\n*Start at:* %s\n*End at:* %s\n*Duration:* %d seconds\n*Exit code:* %d", command, start, end, diff, exitcode),
+      Text: fmt.Sprintf(MESSAGE_ATTACHMENT_TEXT, command, start, end, diff, exitcode),
     })
 
-    slack_hook(msg)
+    response_code := slack_hook(msg)
+    fmt.Printf("--> Slack response code: %d\n", response_code)
   } else {
     fmt.Printf(USAGE, VERSION, os.Args[0])
   }
+}
+
+func wait_for_interrupt() {
+  // Capture a Ctrl-c signal:
+  shutdown_signals := make(chan os.Signal, 1)
+  signal.Notify(shutdown_signals, os.Interrupt)
+  //syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT
+
+  go func() {
+    <-shutdown_signals
+    fmt.Printf("--> Interrupted!.\n")
+    //slack_msg()
+    //fmt.Printf("--> END SEND Interrupted to SLACK!\n")
+    os.Exit(1)
+  }()
+}
+
+func get_command() string {
+  return strings.Join(os.Args[1:], " ")
 }
 
 func exec_command(cmd string) (stdout string, exitcode int) {
@@ -96,7 +122,17 @@ func (m *Message) AddAttachment(a *Attachment) {
   m.Attachments = append(m.Attachments, a)
 }
 
-func slack_hook(msg *Message) {
+func slack_msg() {
+  //msg := &Message{
+  //  Text: fmt.Sprintf("*From*: %s (%s)\nInterrupted execution command on the server", hostname(), ip_address()),
+  //  Channel: SLACK_CHANNEL,
+  //}
+  //fmt.Printf("--> %s\n", msg)
+  fmt.Printf("--> fin...\n")
+  //slack_hook(msg)
+}
+
+func slack_hook(msg *Message) int {
   jsonValues, _ := json.Marshal(msg)
 
   req, err := http.NewRequest(
@@ -113,12 +149,12 @@ func slack_hook(msg *Message) {
 
   client := &http.Client{}
   resp, err := client.Do(req)
+  defer resp.Body.Close()
   if err != nil {
     fmt.Print(err)
   }
 
-  fmt.Printf("--> Slack POST status code: %d\n", resp.StatusCode)
-  defer resp.Body.Close()
+  return resp.StatusCode
 }
 
 func hostname() string {
