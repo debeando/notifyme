@@ -12,6 +12,7 @@ import (
   "strings"
   "syscall"
   "time"
+  // "sync"
 )
 
 const (
@@ -88,16 +89,13 @@ func main() {
 }
 
 func wait_for_interrupt() {
-  // Capture a Ctrl-c signal:
   shutdown_signals := make(chan os.Signal, 1)
-  signal.Notify(shutdown_signals, os.Interrupt)
-  //syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT
+  signal.Notify(shutdown_signals, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 
   go func() {
     <-shutdown_signals
+    fmt.Print("\r")
     fmt.Printf("--> Interrupted!.\n")
-    //slack_msg()
-    //fmt.Printf("--> END SEND Interrupted to SLACK!\n")
     os.Exit(1)
   }()
 }
@@ -120,16 +118,6 @@ func exec_command(cmd string) (stdout string, exitcode int) {
 
 func (m *Message) AddAttachment(a *Attachment) {
   m.Attachments = append(m.Attachments, a)
-}
-
-func slack_msg() {
-  //msg := &Message{
-  //  Text: fmt.Sprintf("*From*: %s (%s)\nInterrupted execution command on the server", hostname(), ip_address()),
-  //  Channel: SLACK_CHANNEL,
-  //}
-  //fmt.Printf("--> %s\n", msg)
-  fmt.Printf("--> fin...\n")
-  //slack_hook(msg)
 }
 
 func slack_hook(msg *Message) int {
