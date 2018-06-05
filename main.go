@@ -12,11 +12,10 @@ import (
   "strings"
   "syscall"
   "time"
-  // "sync"
 )
 
 const (
-  VERSION = "v0.1.2"
+  VERSION = "v0.1.3"
   USAGE = "notifyme (%s)\nUsage: %s <command>\n"
   MESSAGE_TEXT = "*From*: %s (%s)\nFinish executing the command on the server"
   MESSAGE_ATTACHMENT_TEXT = "*Command:* `%s`\n*Start at:* %s\n*End at:* %s\n*Duration:* %d seconds\n*Exit code:* %d"

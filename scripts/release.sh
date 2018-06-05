@@ -25,13 +25,13 @@ declare -a OS=("linux" "darwin")
 for os in "${OS[@]}"
 do
   mkdir -p pkg/${os}_amd64/
-  GOOS=${os} GOARCH=amd64 go build -ldflags "-s -w" -o pkg/${os}_amd64/nm main.go
-  tar -czvf pkg/${os}_amd64/notifyme-${TAG}-${os}_amd64.tar.gz pkg/${os}_amd64/nm
+  GOOS=${os} GOARCH=amd64 go build -ldflags "-s -w" -o pkg/${os}_amd64/notifyme main.go
+  tar -czf pkg/${os}_amd64/notifyme-${os}_amd64.tar.gz -C pkg/${os}_amd64/ notifyme
 
   curl -# \
        -XPOST \
        -H "Authorization:token ${GITHUB_TOKEN}" \
        -H "Content-Type:application/octet-stream" \
-       --data-binary @pkg/${os}_amd64/notifyme-${TAG}-${os}_amd64.tar.gz \
-       https://uploads.github.com/repos/swapbyt3s/NotifyMe/releases/${ID}/assets?name=notifyme-${TAG}-${os}_amd64.tar.gz
+       --data-binary @pkg/${os}_amd64/notifyme-${os}_amd64.tar.gz \
+       https://uploads.github.com/repos/swapbyt3s/NotifyMe/releases/${ID}/assets?name=notifyme-${os}_amd64.tar.gz
 done

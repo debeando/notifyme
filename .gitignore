@@ -12,7 +12,7 @@
 *.out
 
 # Binary
-nm
+notifyme
 
 # MAC OS X
 .DS_Store
