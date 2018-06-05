@@ -5,7 +5,15 @@ time to complete and have news when is finished and profit the time.
 
 ![Slack Message](https://github.com/swapbyt3s/NotifyMe/raw/master/assents/slack.png)
 
-## Setup
+## Install
+
+Paste that at a Terminal prompt:
+
+```bash
+bash < <(curl -s https://raw.githubusercontent.com/swapbyt3s/notifyme/master/install.sh)
+```
+
+## Configure
 
 Define this environment variables on bash before execute command.
 
