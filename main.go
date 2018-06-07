@@ -154,16 +154,16 @@ func hostname() string {
 }
 
 func ip_address() string {
-  addrs, err := net.LookupIP(hostname())
-  if err != nil {
-    fmt.Print(err)
-  }
+  addrs, _ := net.InterfaceAddrs()
 
-  for _, addr := range addrs {
-    if ipv4 := addr.To4(); ipv4 != nil {
-      return ipv4.String()
+  for _, a := range addrs {
+    if ipnet, ok := a.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+      if ipnet.IP.To4() != nil {
+        return ipnet.IP.String()
+      }
     }
   }
+
   return ""
 }
 
