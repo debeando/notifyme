@@ -23,3 +23,9 @@ fi
 if [ ! -z "${FILE}" ]; then
   wget -qO- https://github.com/swapbyt3s/notifyme/releases/download/${TAG}/${FILE} | tar xz -C /usr/local/bin/
 fi
+
+if [ -f /usr/local/bin/notifyme ]; then
+  if [[ "${OSTYPE}" == "linux"* ]]; then
+    ln -s /usr/local/bin/notifyme /usr/bin/notifyme
+  fi
+fi
