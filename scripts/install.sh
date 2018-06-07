@@ -11,6 +11,7 @@ FILE=
 TAG=$(curl --silent "https://api.github.com/repos/swapbyt3s/notifyme/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
 
 if [ -f /usr/local/bin/notifyme ]; then
+  rm -f /usr/bin/notifyme
   rm -f /usr/local/bin/notifyme
 fi
 
