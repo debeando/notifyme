@@ -51,8 +51,6 @@ func main() {
   command := get_command()
 
   if len(command) > 0 {
-    color := "good"
-
     fmt.Printf("==> Run notifyme...\n")
     fmt.Printf("--> Press Ctrl+C to end.\n")
     start := current_timestamp()
@@ -67,16 +65,12 @@ func main() {
     fmt.Printf("--> End at: %s\n", end)
     fmt.Printf("--> Duration: %d\n", diff)
 
-    if exitcode != 0 {
-      color = "danger"
-    }
-
     msg := &Message{
       Text: fmt.Sprintf(MESSAGE_TEXT, hostname(), ip_address()),
       Channel: SLACK_CHANNEL,
     }
     msg.AddAttachment(&Attachment{
-      Color: color,
+      Color: get_color(exitcode),
       Text: fmt.Sprintf(MESSAGE_ATTACHMENT_TEXT, command, start, end, diff, exitcode),
     })
 
@@ -104,7 +98,7 @@ func get_command() string {
 }
 
 func exec_command(cmd string) (stdout string, exitcode int) {
-  out, err := exec.Command("bash", "-c", cmd).Output()
+  out, err := exec.Command("/bin/bash", "-c", cmd).Output()
   if err != nil {
     if exitError, ok := err.(*exec.ExitError); ok {
       ws := exitError.Sys().(syscall.WaitStatus)
@@ -113,6 +107,17 @@ func exec_command(cmd string) (stdout string, exitcode int) {
   }
   stdout = string(out[:])
   return
+}
+
+func get_color(exitcode int) string {
+    if exitcode != 0 {
+      return "danger"
+    }
+    return "good"
+}
+
+func compose_slack_message(command string, start string, end string, diff int, exitcode int) {
+
 }
 
 func (m *Message) AddAttachment(a *Attachment) {
